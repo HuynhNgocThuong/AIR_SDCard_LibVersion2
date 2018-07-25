@@ -128,8 +128,9 @@ DSTATUS USER_initialize (
 )
 {
   /* USER CODE BEGIN INIT */
-		//HAL_UART_Transmit(&huart1,(uint8_t*)"USER_initialize\r\n",17,0x1000);
-		SD_PowerOn();
+		HAL_UART_Transmit(&huart1,(uint8_t*)"USER_initialize\r\n",17,0x1000);
+		//SD_PowerOn();
+		//HAL_Delay(2);
 		if(sd_ini()==0) {Stat &= ~STA_NOINIT;} //Reset status STA_NOINIT
     return Stat;
   /* USER CODE END INIT */

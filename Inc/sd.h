@@ -17,6 +17,7 @@
 #define SD_H_
 //--------------------------------------------------
 #include "stm32f1xx_hal.h"
+#include "fatfs.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -39,6 +40,11 @@ typedef struct sd_info {
   volatile uint8_t type;//Loai the chung ta su dungs
 } sd_info_ptr;
 //--------------------------------------------------
+//FATFS SDFatFs; //File system object structure (FATFS)
+//FATFS *fs;		 //File system object structure (FATFS)
+extern uint8_t sect[512];
+extern uint32_t bytesread;; //byte doc va ghi
+//--------------------------------------------------
 void SD_PowerOn(void);
 uint8_t sd_ini(void);
 void SPI_Release(void);
@@ -46,4 +52,10 @@ uint8_t SD_Read_Block (uint8_t *buff, uint32_t lba);
 uint8_t SD_Write_Block (uint8_t *buff, uint32_t lba);
 uint8_t SPI_wait_ready(void);
 //--------------------------------------------------
+FRESULT ReadLongFile(void);
+void SD_Write_File(void);
+void SD_Read_File(void);
+void SD_List_File(void);
+void SD_Amount_Space(void);
+
 #endif /* SD_H_ */

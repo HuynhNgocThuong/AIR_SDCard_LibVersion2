@@ -101,8 +101,33 @@
         </Book>
         <Book>
           <Number>4</Number>
+          <Title>User Manual (NUCLEO-F103RB)</Title>
+          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32NUCLEO_BSP\1.6.0\Documents\DM00105823.pdf</Path>
+        </Book>
+        <Book>
+          <Number>5</Number>
+          <Title>Overview (NUCLEO-F103RB)</Title>
+          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32NUCLEO_BSP\1.6.0\Documents\DM00105918.pdf</Path>
+        </Book>
+        <Book>
+          <Number>6</Number>
+          <Title>Getting started (NUCLEO-F103RB)</Title>
+          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32NUCLEO_BSP\1.6.0\Documents\DM00105928.pdf</Path>
+        </Book>
+        <Book>
+          <Number>7</Number>
+          <Title>Schematics (NUCLEO-F103RB)</Title>
+          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32NUCLEO_BSP\1.6.0\Documents\MB1136.pdf</Path>
+        </Book>
+        <Book>
+          <Number>8</Number>
           <Title>MCBSTM32E Evaluation Board Web Page (MCBSTM32E)</Title>
           <Path>http://www.keil.com/mcbstm32e/</Path>
+        </Book>
+        <Book>
+          <Number>9</Number>
+          <Title>STM32 Nucleo board (NUCLEO-F103RB)</Title>
+          <Path>http://www.st.com/web/catalog/tools/FM116/SC959/SS1532/LN1847/PF259875</Path>
         </Book>
       </Books>
       <DebugOpt>
@@ -178,7 +203,7 @@
           <Type>0</Type>
           <LineNumber>116</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134224360</Address>
+          <Address>134223412</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -189,30 +214,21 @@
           <ExecCommand></ExecCommand>
           <Expression>\\SD_FATFS\../Src/main.c\116</Expression>
         </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>117</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134224368</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Src/main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\SD_FATFS\../Src/main.c\117</Expression>
-        </Bp>
       </Breakpoint>
+      <WatchWindow1>
+        <Ww>
+          <count>0</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Timer1,0x0A</ItemText>
+        </Ww>
+      </WatchWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>

@@ -64,15 +64,7 @@ UART_HandleTypeDef huart1;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 volatile uint16_t Timer1=0;
-//Mang read long file
-uint8_t sect[512];
-extern char str1[60];
-uint32_t byteswritten, bytesread;
-uint8_t result;
-extern char USER_Path[4]; /* logical drive path */
-FATFS SDFatFs; //File system object structure (FATFS)
-FATFS *fs;		 //File system object structure (FATFS)
-FIL MyFile;    //File object structure (FIL)
+extern FATFS SDFatFs; //File system object structure (FATFS)
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,52 +80,14 @@ static void MX_USART1_UART_Init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-FRESULT ReadLongFile(void)
-{
-  uint16_t i=0, i1=0;
-  uint32_t ind=0;
-  uint32_t f_size = MyFile.fsize;
-  sprintf(str1,"fsize: %lu\r\n",(unsigned long)f_size);
-  HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
-  ind=0;
-  do
-  {
-    if(f_size<512)
-    {
-      i1=f_size;
-    }
-    else
-    {
-      i1=512;
-    }
-    f_size-=i1;
-    f_lseek(&MyFile,ind);
-		//Truyen tung ki tu qua uart
-    f_read(&MyFile,sect,i1,(UINT *)&bytesread);
-    for(i=0;i<bytesread;i++)
-    {
-      HAL_UART_Transmit(&huart1,sect+i,1,0x1000);
-    }
-    ind+=i1;
-  }
-  while(f_size>0);
-  HAL_UART_Transmit(&huart1,(uint8_t*)"\r\n",2,0x1000);
-  return FR_OK;
-}
+
 /* USER CODE END 0 */
 
 int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	uint16_t i;
-	FRESULT res; //result
-	uint8_t wtext[]="Hello from STM32!!!";
-	FILINFO fileInfo;	/* File information structure (FILINFO) */
-	char *fn;
-	DIR dir;  /* Directory object structure (DIR) */
-	//Kiem tra dung luong cua the
-	DWORD fre_clust, fre_sect, tot_sect;
+	
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -160,103 +114,23 @@ int main(void)
   MX_FATFS_Init();
 
   /* USER CODE BEGIN 2 */
-	HAL_TIM_Base_Start_IT(&htim2);
+	//HAL_TIM_Base_Start_IT(&htim2);
 
 	
 	//SDFatFs.drv: Physical drive number
-	disk_initialize(SDFatFs.drv);
+	 disk_initialize(SDFatFs.drv);
 	
 	//write
-	
-	if(f_mount(&SDFatFs,(TCHAR const*)USER_Path,0)!=FR_OK)
-	{
-		Error_Handler();
-	}
-	else
-	{
-		if(f_open(&MyFile,"mywrite.txt",FA_CREATE_ALWAYS|FA_WRITE)!=FR_OK)
-		{
-			Error_Handler();
-		}
-		else
-		{
-			res = f_write(&MyFile,wtext,sizeof(wtext),(void*)&byteswritten);
-			if((byteswritten==0)||(res!=FR_OK))
-			{
-				Error_Handler();
-			}
-			f_close(&MyFile);
-		}
-	}
-	
+	SD_Write_File();
+	HAL_Delay(1000);
+	SD_Read_File();
+	SD_List_File();
+	SD_Amount_Space();
 	//read
-	if(f_mount(&SDFatFs,(TCHAR const*)USER_Path,0)!=FR_OK)
-	{
-		Error_Handler();
-	}
-	else
-	{
-		if(f_open(&MyFile,"mywrite.txt",FA_READ)!=FR_OK)
-		{
-			Error_Handler();
-		}
-		else
-		{
-			ReadLongFile();
-			f_close(&MyFile);
-		}
-	}
+
 	//read dir
-	if(f_mount(&SDFatFs,(TCHAR const*)USER_Path,0)!=FR_OK)
-	{
-		Error_Handler();
-	}
-	else
-	{
-		fileInfo.lfname = (char*)sect;
-		fileInfo.lfsize = sizeof(sect);
-		result = f_opendir(&dir, "/");
-		//Liet ke danh sach tep tin co trong sd card
-		if (result == FR_OK)
-		{
-			while(1)
-			{
-				result = f_readdir(&dir, &fileInfo);
-				if (result==FR_OK && fileInfo.fname[0])
-				{
-					fn = fileInfo.lfname; // Pointer to the LFN buffer
-					//khi truyen buffer vao HAL_UART thi truyen vao dia chi dau tien cua mang se liet ke het danh sach cac file co trong SD
-					if(strlen(fn)) HAL_UART_Transmit(&huart1,(uint8_t*)fn,strlen(fn),0x1000);
-					else HAL_UART_Transmit(&huart1,(uint8_t*)fileInfo.fname,strlen((char*)fileInfo.fname),0x1000);
-					if(fileInfo.fattrib&AM_DIR)
-					{
-						HAL_UART_Transmit(&huart1,(uint8_t*)"  [DIR]",7,0x1000);
-					}					
-				}
-				else break;
-				HAL_UART_Transmit(&huart1,(uint8_t*)"\r\n",2,0x1000);
-			}
-			f_closedir(&dir);
-		}
-	}
+
 	//Kiem tra dung luong cua bo nho
-	f_getfree("/", &fre_clust, &fs); /* Get Number of Free Clusters                                           */
-	sprintf(str1,"fre_clust: %lu\r\n",fre_clust);
-	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
-	sprintf(str1,"n_fatent: %lu\r\n",fs->n_fatent);
-	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
-	sprintf(str1,"fs_csize: %d\r\n",fs->csize);
-	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
-	tot_sect = (fs->n_fatent - 2) * fs->csize; /* Number of FAT entries, = number of clusters + 2 */
-	sprintf(str1,"tot_sect: %lu\r\n",tot_sect);
-	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
-	fre_sect = fre_clust * fs->csize;
-	sprintf(str1,"fre_sect: %lu\r\n",fre_sect);
-	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
-	sprintf(str1, "%lu KB tong dung luong sd.\r\n%lu KB dung luong con lai.\r\n",
-	tot_sect/2, fre_sect/2);
-	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
-	FATFS_UnLinkDriver(USER_Path);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -443,6 +317,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		Timer1++;
 	}
 }
+#ifdef __GNUC__
+  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif
+
+PUTCHAR_PROTOTYPE  
+{
+    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 100);
+    return ch;
+}
 //----------------------------------------------------------
 /* USER CODE END 4 */
 
@@ -457,6 +342,8 @@ void _Error_Handler(char * file, int line)
   /* User can add his own implementation to report the HAL error return state */
   while(1) 
   {
+		printf("Error\r\n");
+		break;
   }
   /* USER CODE END Error_Handler_Debug */ 
 }
