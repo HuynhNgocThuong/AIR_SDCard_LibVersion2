@@ -62,8 +62,8 @@ uint8_t SPI_wait_ready(void);
 FRESULT ReadLongFile(void);
 
 void SD_Write_File(const char* filename, const char* buffer, uint8_t size);
-void SD_Read_File(const char* filename);
+uint8_t* SD_Read_File(const char* filename);
 void SD_List_File(void);
-void SD_Amount_Space(void);
+unsigned long SD_Amount_Space(void);
 
 #endif /* SD_H_ */

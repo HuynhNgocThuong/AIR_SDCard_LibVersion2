@@ -81,8 +81,6 @@ static void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN 0 */
 struct sd_data SD;
-uint8_t size = 0;
-char filename[]="sim.txt";
 /* USER CODE END 0 */
 
 int main(void)
@@ -121,6 +119,7 @@ int main(void)
 	disk_initialize(SDFatFs.drv);
 	memcpy(SD.filename,"thuong.txt",strlen("thuong.txt")+1);
 	memcpy(SD.wdata,SD.filename,strlen(SD.filename));
+	memcpy(SD.wdata,"aaaaaa",strlen("aaaaaa"));
 	SD.size = strlen(SD.wdata);
 	//write
   SD_Write_File(SD.filename, SD.wdata, SD.size);

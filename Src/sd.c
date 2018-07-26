@@ -33,7 +33,6 @@ FIL MyFile;    //File object structure (FIL)
 	uint32_t byteswritten, bytesread;; //byte doc va ghi
 	uint8_t result;
 	uint16_t i;
-	uint8_t wtext1[]="";
 	//------------------------------------------------------List file
 	FRESULT res; //result
 	FILINFO fileInfo;	/* File information structure (FILINFO) */
@@ -296,7 +295,7 @@ void SD_Write_File(const char* filename, const char* buffer, uint8_t size){
 			}
 		}
 }
-void SD_Read_File(const char* filename){
+uint8_t* SD_Read_File(const char* filename){
 	if(f_mount(&SDFatFs,(TCHAR const*)USER_Path,0)!=FR_OK)
 		{ 
 			Error_Handler();
@@ -313,6 +312,7 @@ void SD_Read_File(const char* filename){
 				f_close(&MyFile);
 			}
 		 }
+	return SD.rdata;
 }
 void SD_List_File(void){
 		if(f_mount(&SDFatFs,(TCHAR const*)USER_Path,0)!=FR_OK)
@@ -348,7 +348,7 @@ void SD_List_File(void){
 		}
 	}
 }
-void SD_Amount_Space(void){
+unsigned long SD_Amount_Space(void){
 	f_getfree("/", &fre_clust, &fs); /* Get Number of Free Clusters                                           */
 	sprintf(str1,"fre_clust: %lu\r\n",fre_clust);
 	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
@@ -366,4 +366,5 @@ void SD_Amount_Space(void){
 	tot_sect/2, fre_sect/2);
 	HAL_UART_Transmit(&huart1,(uint8_t*)str1,strlen(str1),0x1000);
 	FATFS_UnLinkDriver(USER_Path);
+	return fre_sect;
 }
