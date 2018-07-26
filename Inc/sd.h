@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 //--------------------------------------------------
+
 #define CS_SD_GPIO_PORT GPIOA
 #define CS_SD_PIN GPIO_PIN_3
 #define SS_SD_SELECT() HAL_GPIO_WritePin(CS_SD_GPIO_PORT, CS_SD_PIN, GPIO_PIN_RESET)
@@ -39,6 +40,12 @@
 typedef struct sd_info {
   volatile uint8_t type;//Loai the chung ta su dungs
 } sd_info_ptr;
+struct sd_data{
+	uint8_t size;
+	uint8_t rdata[1000];
+  char wdata[100];
+	char filename[];
+};
 //--------------------------------------------------
 //FATFS SDFatFs; //File system object structure (FATFS)
 //FATFS *fs;		 //File system object structure (FATFS)
@@ -53,8 +60,9 @@ uint8_t SD_Write_Block (uint8_t *buff, uint32_t lba);
 uint8_t SPI_wait_ready(void);
 //--------------------------------------------------
 FRESULT ReadLongFile(void);
-void SD_Write_File(void);
-void SD_Read_File(void);
+
+void SD_Write_File(const char* filename, const char* buffer, uint8_t size);
+void SD_Read_File(const char* filename);
 void SD_List_File(void);
 void SD_Amount_Space(void);
 

@@ -1,5 +1,6 @@
 
 #include "sd.h"
+#include "string.h"
 //--------------------------------------------------
 // Definitions for MMC/SDC command
 #define CMD0 (0x40+0) // GO_IDLE_STATE
@@ -18,20 +19,23 @@ extern UART_HandleTypeDef huart1;
 extern volatile uint16_t Timer1;
 sd_info_ptr sdinfo;
 //-------------------------------------------------- Delecrare variable
-char str1[60]={0};
-//Mang read long file
-uint8_t sect[512];
-uint32_t byteswritten, bytesread;; //byte doc va ghi
-uint8_t result;
+
 extern char USER_Path[4]; /* logical drive path */
+extern struct sd_data SD;
 FATFS SDFatFs; //File system object structure (FATFS)
 FATFS *fs;		 //File system object structure (FATFS)
 FIL MyFile;    //File object structure (FIL)
 FIL MyFile;    //File object structure (FIL)
 //-------------------------------------------------- main
+	char str1[60]={0};
+	//Mang read long file
+	uint8_t sect[512];
+	uint32_t byteswritten, bytesread;; //byte doc va ghi
+	uint8_t result;
 	uint16_t i;
+	uint8_t wtext1[]="";
+	//------------------------------------------------------List file
 	FRESULT res; //result
-	uint8_t wtext[]="Hello from STM32!!!\r\n";
 	FILINFO fileInfo;	/* File information structure (FILINFO) */
 	char *fn;
 	DIR dir;  /* Directory object structure (DIR) */
@@ -254,10 +258,11 @@ FRESULT ReadLongFile(void)
     }
     f_size-=i1;
     f_lseek(&MyFile,ind);
-    f_read(&MyFile,sect,i1,(UINT *)&bytesread);
+    f_read(&MyFile,SD.rdata,i1,(UINT *)&bytesread);
     for(i=0;i<bytesread;i++)
     {
-      HAL_UART_Transmit(&huart1,sect+i,1,0x1000);
+			//SD.rdata mang 1000 phan tu
+      HAL_UART_Transmit(&huart1,SD.rdata+i,1,0x1000);
     }
     ind+=i1;
   }
@@ -266,14 +271,15 @@ FRESULT ReadLongFile(void)
   return FR_OK;
 }
 
-void SD_Write_File(void){
+
+void SD_Write_File(const char* filename, const char* buffer, uint8_t size){
 		if(f_mount(&SDFatFs,(TCHAR const*)USER_Path,0)!=FR_OK)
 		{
 			Error_Handler();
 		}
 		else
 		{
-			if(f_open(&MyFile,"sim.txt", FA_OPEN_ALWAYS|FA_WRITE)!=FR_OK)
+			if(f_open(&MyFile, filename, FA_OPEN_ALWAYS|FA_WRITE)!=FR_OK)
 			{
 				Error_Handler();
 			}
@@ -281,7 +287,7 @@ void SD_Write_File(void){
 			{
 				res = f_lseek(&MyFile , MyFile.fsize);
 				byteswritten = 0;
-				res=f_write(&MyFile,wtext,sizeof(wtext),(void*)&byteswritten);
+				res=f_write(&MyFile, buffer, size,(void*)&byteswritten);
 				if((byteswritten==0)||(res!=FR_OK))
 				{
 					Error_Handler();
@@ -290,14 +296,14 @@ void SD_Write_File(void){
 			}
 		}
 }
-void SD_Read_File(void){
+void SD_Read_File(const char* filename){
 	if(f_mount(&SDFatFs,(TCHAR const*)USER_Path,0)!=FR_OK)
 		{ 
 			Error_Handler();
 		}
 		else
 		{
-			if(f_open(&MyFile,"sim.txt",FA_READ|FA_OPEN_EXISTING)!=FR_OK)
+			if(f_open(&MyFile,filename,FA_READ|FA_OPEN_EXISTING)!=FR_OK)
 			{
 				Error_Handler();
 			}

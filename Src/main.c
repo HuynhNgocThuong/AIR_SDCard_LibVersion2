@@ -56,13 +56,12 @@
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi2;
-
 TIM_HandleTypeDef htim2;
-
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+#define wSize 100
 volatile uint16_t Timer1=0;
 extern FATFS SDFatFs; //File system object structure (FATFS)
 /* USER CODE END PV */
@@ -75,17 +74,19 @@ static void MX_TIM2_Init(void);
 static void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
+
 /* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-
+struct sd_data SD;
+uint8_t size = 0;
+char filename[]="sim.txt";
 /* USER CODE END 0 */
 
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 	
   /* USER CODE END 1 */
@@ -115,17 +116,18 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 	//HAL_TIM_Base_Start_IT(&htim2);
-
-	
 	//SDFatFs.drv: Physical drive number
-	 disk_initialize(SDFatFs.drv);
-	
+	//Initial SD card
+	disk_initialize(SDFatFs.drv);
+	memcpy(SD.filename,"thuong.txt",strlen("thuong.txt")+1);
+	memcpy(SD.wdata,SD.filename,strlen(SD.filename));
+	SD.size = strlen(SD.wdata);
 	//write
-	SD_Write_File();
+  SD_Write_File(SD.filename, SD.wdata, SD.size);
 	HAL_Delay(1000);
-	SD_Read_File();
-	SD_List_File();
-	SD_Amount_Space();
+	SD_Read_File(SD.filename);
+	//SD_List_File();
+	//SD_Amount_Space();
 	//read
 
 	//read dir
